@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Interface PayPal Propre</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f7f9fc;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-sub: #666666;
+            --paypal-blue: #0070ba;
+            --soft-blue: #e8f0fe;
+            --nh-blue: #0044cc;
+            --positive-green: #00824b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; background: white;
+        }
+
+        .header-icon {
+            background-color: var(--soft-blue); color: var(--paypal-blue);
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .container { padding: 15px; padding-bottom: 100px; }
+
+        .card {
+            background: var(--card-bg); border-radius: 24px; padding: 22px;
+            margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        /* --- Zone Solde Ajustée --- */
+        .balance-section { cursor: pointer; min-height: 70px; }
+        .paypal-card-header { display: flex; align-items: center; margin-bottom: 15px; color: var(--paypal-blue); }
+        
+        .amount-display { 
+            font-size: 32px; /* Taille réduite */
+            font-weight: 700; /* Gras comme les virements */
+            display: flex; align-items: center; gap: 8px; 
+        }
+        
+        #balance-input {
+            font-size: 28px; font-weight: 700; width: 80%; border: none; outline: none;
+            background: #f0f4f8; border-radius: 8px; padding: 5px; font-family: inherit;
+        }
+
+        /* --- Activité --- */
+        .activity-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 5px 10px; }
+        .activity-header h3 { margin: 0; font-size: 19px; font-weight: 700; }
+        .see-more { color: #757575; text-decoration: none; font-size: 14px; }
+
+        .transaction-item { display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid #f2f2f2; }
+        .transaction-item:last-child { border-bottom: none; }
+
+        .icon-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; flex-shrink: 0; }
+        .bg-bfor { background: #004481; }
+        .bg-nh { background: var(--nh-blue); }
+
+        .trans-info { flex-grow: 1; overflow: hidden; }
+        .trans-info h4 { margin: 0; font-size: 15px; font-weight: 600; }
+        .trans-info p { margin: 2px 0 0; font-size: 12px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .trans-amount { font-weight: 700; font-size: 15px; white-space: nowrap; }
+        .pos { color: var(--positive-green); }
+
+        /* --- Navigation --- */
+        nav.bottom-nav {
+            position: fixed; bottom: 0; width: 100%; background: white;
+            display: flex; justify-content: space-around; padding: 12px 0 30px;
+            border-top: 1px solid #eee;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #757575; text-decoration: none; }
+        .nav-item.active { color: var(--paypal-blue); }
+        .nav-item .material-icons { font-size: 26px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-icon"><span class="material-icons">menu</span></div>
+        <div style="display:flex; gap:12px;">
+            <div class="header-icon"><span class="material-icons">notifications_none</span></div>
+            <div class="header-icon"><span class="material-icons">person_outline</span></div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card" style="display:flex; align-items:center; gap:15px;">
+            <div style="width:40px; height:40px; border-radius:50%; border:3px solid var(--soft-blue); border-top-color:var(--paypal-blue); display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:12px;">4/5</div>
+            <div>
+                <h4 style="margin:0; font-size:15px;">Configurer votre compte</h4>
+                <p style="margin:2px 0 0; font-size:13px; color:var(--text-sub);">Vous avez presque terminé.</p>
+            </div>
+        </div>
+
+        <div class="card balance-section" onclick="enableEdit()">
+            <div class="paypal-card-header">
+                <span class="material-icons" style="margin-right:8px; font-size:20px;">credit_card</span>
+                <span style="font-weight:600; font-size:15px;">Solde PayPal</span>
+            </div>
+            <div id="balance-container" class="amount-display">
+                <span id="balance-text">7230,00</span><span>€</span>
+            </div>
+        </div>
+
+        <div class="activity-header">
+            <h3>Activité récente</h3>
+            <a href="#" class="see-more">Afficher plus ></a>
+        </div>
+        
+        <div class="card">
+            <div class="transaction-item">
+                <div class="icon-circle bg-bfor"><span class="material-icons" style="font-size:20px;">account_balance</span></div>
+                <div class="trans-info">
+                    <h4>BforBank</h4>
+                    <p>Virement immédiat vers un compte bancaire - Ter...</p>
+                </div>
+                <div class="trans-amount">-4380 €</div>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="icon-circle bg-nh">NH</div>
+                <div class="trans-info">
+                    <h4>Nassim Houat</h4>
+                    <p>Argent reçu</p>
+                </div>
+                <div class="trans-amount pos">+800 €</div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="icon-circle bg-nh">NH</div>
+                <div class="trans-info">
+                    <h4>Nassim Houat</h4>
+                    <p>Argent reçu</p>
+                </div>
+                <div class="trans-amount pos">+300 €</div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active"><span class="material-icons">home</span><span>Accueil</span></div>
+        <div class="nav-item"><span class="material-icons">credit_card</span><span>Comptes</span></div>
+        <div class="nav-item"><span class="material-icons">swap_vert</span><span>Envoyer/demander</span></div>
+        <div class="nav-item"><span class="material-icons">chat_bubble_outline</span><span>Activité</span></div>
+    </nav>
+
+    <script>
+        function enableEdit() {
+            const container = document.getElementById('balance-container');
+            const currentVal = document.getElementById('balance-text').innerText.replace(',', '.');
+            
+            container.onclick = (e) => e.stopPropagation();
+            container.innerHTML = `<input type="number" id="balance-input" value="${currentVal}" step="0.01">`;
+            
+            const input = document.getElementById('balance-input');
+            input.focus();
+
+            input.onblur = saveBalance;
+            input.onkeydown = (e) => { if(e.key === 'Enter') saveBalance(); };
+        }
+
+        function saveBalance() {
+            const input = document.getElementById('balance-input');
+            const val = parseFloat(input.value) || 0;
+            const formatted = val.toFixed(2).replace('.', ',');
+            
+            const container = document.getElementById('balance-container');
+            container.innerHTML = `<span id="balance-text">${formatted}</span><span>€</span>`;
+            
+            setTimeout(() => { container.onclick = null; }, 100);
+        }
+    </script>
+
+</body>
+</html>
